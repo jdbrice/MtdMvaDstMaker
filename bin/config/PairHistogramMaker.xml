@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+
+	<pre>lsp_, lsn_, uls_, </pre>
+	<histograms>
+		<Histo prefixes="lsp_, lsn_, uls_" name="mass" x="M_{#mu#mu} (GeV/c^{2})" y="dN/dM_{#mu#mu} (GeV/c^{2})^{-1}" titles="(++), (--), (+-)" bins_x="bins.mass" />
+		<Histo prefixes="lsp_, lsn_, uls_, " name="pT" x="p_{T} (GeV/c)" y="dN/dp_{T} (GeV/c)^{-1}" titles="(++), (--), (+-)" bins_x="bins.pT" />
+		<Histo prefixes="lsp_, lsn_, uls_, " name="pT_lpT" x="Leading p_{T} (GeV/c)" y="pair p_{T} (GeV/c)" titles="(++), (--), (+-)" bins_x="bins.pT" bins_y="bins.pT" />
+		<Histo prefixes="lsp_, lsn_, uls_, " name="pT_slpT" x="Sub-Leading p_{T} (GeV/c)" y="pair p_{T} (GeV/c)" titles="(++), (--), (+-)" bins_x="bins.pT" bins_y="bins.pT" />
+
+		<Histo prefixes="lsp_, lsn_, uls_" name="mass_deltaPhi" x="#Delta #phi" y="M_{#mu#mu} (GeV/c^{2})" titles="(++), (--), (+-)" bins_x="bins.deltaPhi" bins_y="bins.mass" />
+		<Histo prefixes="lsp_, lsn_, uls_" name="pT_deltaPhi" x="#Delta #phi" y="p_{T} (GeV/c)" titles="(++), (--), (+-)" bins_x="bins.deltaPhi" bins_y="bins.pT" />
+		<Histo prefixes="lsp_, lsn_, uls_" name="pT_mass" x="M_{#mu#mu} (GeV/c^{2})" y="p_{T} (GeV/c)" titles="(++), (--), (+-)" bins_x="bins.mass" bins_y="bins.pT" />
+		<Histo prefixes="lsp_, lsn_, uls_" name="vtxZ_mass" x="M_{#mu#mu} (GeV/c^{2})" y="vtxZ (cm)" titles="(++), (--), (+-)" bins_x="bins.mass" bins_y="bins.vtxZ" />
+		<Histo prefixes="lsp_, lsn_, uls_" name="gRefMult_mass" x="M_{#mu#mu} (GeV/c^{2})" y="gRefMult" titles="(++), (--), (+-)" bins_x="bins.mass" bins_y="bins.gRefMult" />
+		
+		<Histo prefixes="lsp_, lsn_, uls_" name="mass_tf1_1" x="M_{#mu#mu} (GeV/c^{2})" y="dN/dM_{#mu#mu} (GeV/c^{2})^{-1}" titles="(++), (--), (+-)" bins_x="bins.mass" />
+		<Histo prefixes="lsp_, lsn_, uls_" name="mass_tf1_N" x="M_{#mu#mu} (GeV/c^{2})" y="dN/dM_{#mu#mu} (GeV/c^{2})^{-1}" titles="(++), (--), (+-)" bins_x="bins.mass" />
+		<Histo prefixes="lsp_, lsn_, uls_" name="mass_tfN_N" x="M_{#mu#mu} (GeV/c^{2})" y="dN/dM_{#mu#mu} (GeV/c^{2})^{-1}" titles="(++), (--), (+-)" bins_x="bins.mass" />
+
+
+		<Histo prefixes="lsp_, lsn_, uls_" name="deltaPhi" x="#Delta #phi" y="dN/d#Delta #phi" titles="(++), (--), (+-)" bins_x="bins.deltaPhi" />
+		<Histo prefixes="lsp_, lsn_, uls_" name="deltaEta" x="#Delta #eta" y="dN/d#Delta #eta" titles="(++), (--), (+-)" bins_x="bins.deltaEta" />
+
+		<Histo prefixes="lsp_, lsn_, uls_" name="eta_phi" x="#phi" y="#eta" titles="(++), (--), (+-)" bins_x="bins.phi" bins_y="bins.eta" />
+
+		<Histo prefixes="lsp_, lsn_, uls_" name="N" x="# Pairs" y="" titles="(++), (--), (+-)" bins_x="bins.nPairs" />
+
+
+
+	</histograms>
+
+</config>
