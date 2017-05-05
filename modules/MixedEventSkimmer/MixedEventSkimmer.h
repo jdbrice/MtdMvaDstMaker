@@ -14,6 +14,7 @@
 
 // ROOT
 #include "TRandom3.h"
+#include "TNamed.h"
 
 class MixedEventSkimmer : public TreeAnalyzer
 {
@@ -132,6 +133,9 @@ protected:
 			LOG_F( 0, "Entries in buffer[ %d, %lu, %lu ] = %lu", std::get<0>(kv.first), std::get<1>(kv.first), std::get<2>(kv.first), kv.second.size() );
 			// LOG_F( 0, "RunId=%lu, EvnetId=%lu", kv.second[0]._runId, kv.second[0]._eventId );
 		}
+
+		TNamed config_str( "config", config.toXml() );
+		config_str.Write();
 	}
 };
 
