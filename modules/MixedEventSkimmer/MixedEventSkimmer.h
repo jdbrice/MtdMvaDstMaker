@@ -47,7 +47,7 @@ public:
 		_rTracks.setup( chain, "Tracks" );
 		_rMtdPid.setup( chain, "MtdPidTraits" );
 
-		bufferSize = 10;
+		bufferSize = config.getInt( "bufferSize", 10 );
 
 		h_vtxZ.load( config, nodePath + ".Mix.vtxZ" );
 		h_gRefMult.load( config, nodePath + ".Mix.gRefMult" );
@@ -77,15 +77,11 @@ protected:
 	}
 
 	void addToBuffer( vector<FemtoTrackContainer> &vtc, FemtoTrackContainer tc ){
-
-		// DLOG_F( 5, "[%lu, %lu, %d]", tc._runId, tc._eventId, tc._track->mId );
-
-		size_t modSize = bufferSize * 3;
-		if ( vtc.size() < modSize )
+		if ( vtc.size() < bufferSize )
 			vtc.push_back( tc );
 		else {
 			// replace in proper size of buffer
-			size_t index = rander.Integer( modSize );
+			size_t index = rander.Integer( bufferSize );
 			vtc[ index ] = tc;
 		}
 	}

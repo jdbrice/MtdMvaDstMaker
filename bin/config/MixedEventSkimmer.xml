@@ -2,6 +2,8 @@
 <config>
 	<Task name="MixedEventAnalyzer" type="MixedEventAnalyzer" config="" nodePath="MES" />
 
+	<bufferSize>30</bufferSize>
+
 	<MES>
 		<EventLoop progress="true" />
 		<input>
