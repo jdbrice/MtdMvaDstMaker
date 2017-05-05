@@ -9,7 +9,7 @@
 		</input>
 
 		<output>
-			<TFile url="mix_data.root" />
+			<TFile url="./out/mix_data_{jobIndex}.root" />
 		</output>
 
 		<Mix>
