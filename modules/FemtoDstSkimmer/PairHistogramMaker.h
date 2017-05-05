@@ -54,7 +54,7 @@ public:
 	void analyze( FemtoTrackProxy &_tp1, FemtoTrackProxy &_tp2 ){
 		if ( nullptr == this->_book) return;
 
-		if ( _tp1._track->mPt < 1.55 || _tp2._track->mPt < 1.55 ) return;
+		// if ( _tp1._track->mPt < 1.55 || _tp2._track->mPt < 1.55 ) return;
 
 		int chargeSum = _tp1._track->charge() + _tp2._track->charge();
 		FemtoTrackProxy *ltp = &_tp1;

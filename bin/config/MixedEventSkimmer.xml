@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-	<Task name="MixedEventSkimmer" type="MixedEventSkimmer" config="" nodePath="MES" />
+	<Task name="MixedEventAnalyzer" type="MixedEventAnalyzer" config="" nodePath="MES" />
 
 	<MES>
 		<EventLoop progress="true" />
 		<input>
-			<dst treeName="FemtoDst" url="./list.lis" splitBy="10" maxFiles="-1"/>
+			<dst treeName="FemtoDst" url="./list.lis" splitBy="50" maxFiles="-1" nEvents="-1"/>
 		</input>
 
 		<output>
@@ -33,8 +33,8 @@
 		<vtxZ width="1" min="-105" max="105" />
 		<nPairs width="1" min="0" max="5" />
 		<triggerFlag width="1" min="0" max="15" />
-		<mass width="0.025" min="0" max="4.0" />
-		<pT width="0.025" min="0" max="5.0" />
+		<mass width="0.025" min="0" max="10.0" />
+		<pT width="0.025" min="0" max="15.0" />
 		<deltaPhi width="0.01" min="0" max="3.15" />
 		<deltaEta width="0.01" min="0" max="2" />
 
