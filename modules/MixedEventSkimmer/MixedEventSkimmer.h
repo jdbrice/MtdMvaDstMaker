@@ -136,6 +136,9 @@ protected:
 
 		TNamed config_str( "config", config.toXml() );
 		config_str.Write();
+
+		TNamed config_dump( "plain_config", config.dump() );
+		config_dump.Write();
 	}
 };
 
