@@ -41,3 +41,5 @@ modules/PicoDstSL16cMtd/DictionaryPicoDstSL16cMTD\.cpp
 *.log
 
 bin/list\.lis
+.vscode/
+bin/lldb_shim.sh

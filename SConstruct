@@ -6,9 +6,6 @@ import platform
 SConscript('color_SConscript')
 Import( 'env' )
 
-SConscript('color_SConscript')
-Import( 'env' )
-
 # env = Environment()
 
 SConscript( "modules/FemtoDstFormat/SConstruct" )
@@ -30,10 +27,14 @@ env.Append(CPPPATH   = [ ROOT_SYS + "/include/", JDB_LIB + "/include" ])
 env.Append(CXXFLAGS  = ROOTCFLAGS )
 env.Append(LINKFLAGS = ROOTCFLAGS )
 
+debug = ARGUMENTS.get('debug', 0)
+if int(debug):
+    env.Append(CXXFLAGS = '-g')
+
 env[ "_LIBFLAGS" ] = env[ "_LIBFLAGS" ] + " " + ROOTLIBS + " "
 # REMOVE "-pthread" from clang link options in OS X
 # assuming darwin=clang but must be a better way...
 if "Darwin" in platform.platform() :
 	env[ "LINKFLAGS" ].remove( "-pthread" )
 
-env.Program( target="bin/pairAna.app", source=[ "modules/FemtoDstFormat/DictionaryFemtoDst.cpp", "Engine.cpp"] )
+env.Program( target="bin/ana.app", source=[ "modules/FemtoDstFormat/DictionaryFemtoDst.cpp", "Engine.cpp"] )
