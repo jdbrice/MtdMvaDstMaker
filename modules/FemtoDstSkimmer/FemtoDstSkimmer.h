@@ -111,6 +111,13 @@ protected:
 
 		wTree->Fill();
 	}
+
+
+	virtual void postMake() {
+		TreeAnalyzer::postMake();
+
+		wTree->Write();
+	}
 	
 };
 
