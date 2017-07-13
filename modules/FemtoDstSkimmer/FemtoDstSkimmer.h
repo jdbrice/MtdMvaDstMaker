@@ -17,6 +17,8 @@
 #include "FemtoDstFormat/FemtoMtdPidTraits.h"
 #include "FemtoDstFormat/FemtoTrackProxy.h"
 
+#include "MvaDstFormat/TrackHeap.h"
+
 #include "vendor/loguru.h"
 
 
@@ -37,12 +39,8 @@ protected:
 	// Writing
 	TTree * wTree = nullptr;
 	
-	BranchWriter<FemtoEvent> _wEvent;
-	TClonesArrayWriter<FemtoTrack> _wTracks;
-	TClonesArrayWriter<FemtoMtdPidTraits> _wMtdPid;
-	TClonesArrayWriter<FemtoMcTrack> _wMcTracks;
-	TClonesArrayWriter<FemtoMcVertex> _wMcVertices;
-	TClonesArrayWriter<FemtoTrackHelix> _wHelices;
+	BranchWriter<TrackHeap> _wTrackHeap;
+	
 
 public:
 	virtual const char* classname() const {return "FemtoDstSkimmer";}
@@ -60,14 +58,9 @@ public:
 
 
 		book->cd();
-		wTree = new TTree( "FemtoDst", "FemtoDst" );
-		_wEvent.createBranch( wTree, "Event" );
-		_wTracks.createBranch( wTree, "Tracks" );
-		_wMcTracks.createBranch( wTree, "McTracks" );
-		_wMcVertices.createBranch( wTree, "McVertices" );
-		_wMtdPid.createBranch( wTree, "MtdPidTraits" );
-
-
+		wTree = new TTree( "MvaDst", "MvaDst" );
+		_wTrackHeap.createBranch( wTree, "" );
+	
 	}
 
 protected:
@@ -75,41 +68,61 @@ protected:
 	virtual void analyzeEvent(){
 		_event = _rEvent.get();
 
-		_wEvent.set( _event );
-		
-		_wTracks.reset();
-		_wMtdPid.reset();
+		// _wEvent.set( _event );
+		TrackHeap trackHeap;
+		// _wTracks.reset();
+		// _wTrackHeap.reset();
 		size_t nTracks = _rTracks.N();
 		for (size_t i = 0; i < nTracks; i++ ){
 			FemtoTrack * track = _rTracks.get(i);
 
+
+			trackHeap.reset();
+
+			FemtoMcTrack * mcTrack = nullptr;
 			FemtoMtdPidTraits *mtdPid = nullptr;
 			if ( track->mMtdPidTraitsIndex >= 0) 
 				mtdPid = _rMtdPid.get( track->mMtdPidTraitsIndex );
+			if ( track->mMcIndex >= 0 )
+				mcTrack = _rMcTracks.get( track->mMcIndex );
+
+			if ( nullptr == mtdPid || nullptr == mcTrack || mcTrack->mParentIndex >= 0 )
+				continue;
 			
-		
-			if ( nullptr != mtdPid ){
-				_wTracks.add( track );
-				_wMtdPid.add( mtdPid );
-			}
+			trackHeap.Tracks_mPt               = track->mPt;
+			trackHeap.Tracks_mEta              = track->mEta;
+			trackHeap.Tracks_mPhi              = track->mPhi;
+			trackHeap.Tracks_mDedx             = track->dEdx();;
+			trackHeap.Tracks_mCharge           = track->mNHitsFit / abs(track->mNHitsFit);;
+			trackHeap.Tracks_mNHitsFit         = abs(track->mNHitsFit);
+			trackHeap.Tracks_mNHitsMax         = track->mNHitsMax;
+			trackHeap.Tracks_mNHitsDedx        = track->mNHitsDedx;
+			trackHeap.Tracks_mNSigmaPion       = track->nSigmaPion();;
+			trackHeap.Tracks_mDCA              = track->gDCA();;
+
+
+			trackHeap.McTracks_mPt             = mcTrack->mPt;
+			trackHeap.McTracks_mEta            = mcTrack->mEta;
+			trackHeap.McTracks_mPhi            = mcTrack->mPhi;
+			trackHeap.McTracks_mGeantPID       = mcTrack->mGeantPID;
+			trackHeap.McTracks_mCharge         = mcTrack->mCharge;
+			trackHeap.McTracks_mNHits          = mcTrack->mNHits;
+
+			trackHeap.MtdPidTraits_mDeltaY     = mtdPid->mDeltaY;
+			trackHeap.MtdPidTraits_mDeltaZ     = mtdPid->mDeltaZ;
+			trackHeap.MtdPidTraits_mMatchFlag  = mtdPid->mMatchFlag;
+			trackHeap.MtdPidTraits_mMtdHitChan = mtdPid->mMtdHitChan;
+			trackHeap.MtdPidTraits_mCell       = mtdPid->cell();
+			trackHeap.MtdPidTraits_mBL         = mtdPid->backleg();
+			trackHeap.MtdPidTraits_mModule     = mtdPid->module();
+
+
+			_wTrackHeap.set( trackHeap );
+			wTree->Fill();
 		} // nTracks
 
 
-		_wMcTracks.reset();
-		size_t nMcTracks = _rMcTracks.N();
-		for (size_t i = 0; i < nMcTracks; i++ ){
-			FemtoMcTrack * mcTrack = _rMcTracks.get( i );
-			_wMcTracks.add( mcTrack );
-		}
-
-		_wMcVertices.reset();
-		size_t nMcVertices = _rMcVertices.N();
-		for (size_t i = 0; i < nMcVertices; i++ ){
-			FemtoMcVertex * mcVertex = _rMcVertices.get( i );
-			_wMcVertices.add( mcVertex );
-		}
-
-		wTree->Fill();
+		
 	}
 
 

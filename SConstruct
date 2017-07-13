@@ -9,6 +9,7 @@ Import( 'env' )
 # env = Environment()
 
 SConscript( "modules/FemtoDstFormat/SConstruct" )
+SConscript( "modules/MvaDstFormat/SConstruct" )
 # SConscript( "modules/PicoDstSL16cMtd/SConstruct" )
 # SConscript( "modules/ProductionUtils/SConstruct")
 
@@ -37,4 +38,4 @@ env[ "_LIBFLAGS" ] = env[ "_LIBFLAGS" ] + " " + ROOTLIBS + " "
 if "Darwin" in platform.platform() :
 	env[ "LINKFLAGS" ].remove( "-pthread" )
 
-env.Program( target="bin/ana.app", source=[ "modules/FemtoDstFormat/DictionaryFemtoDst.cpp", "Engine.cpp"] )
+env.Program( target="bin/ana.app", source=[ "modules/MvaDstFormat/DictionaryTrackHeap.cpp", "modules/FemtoDstFormat/DictionaryFemtoDst.cpp", "Engine.cpp"] )

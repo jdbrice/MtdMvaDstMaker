@@ -7,7 +7,7 @@
 			<dst treeName="FemtoDst" url="./list.lis" splitBy="50" maxFiles="-1"/>
 		</input>
 		<output>
-			<TFile url="FemtoDst_{jobIndex}.root" />
+			<TFile url="MvaDst_{jobIndex}.root" />
 		</output>
 	</FDS>
 </config>
