@@ -112,7 +112,11 @@ protected:
 			trackHeap.MtdPidTraits_mDeltaZ     = mtdPid->mDeltaZ;
 			trackHeap.MtdPidTraits_mMatchFlag  = mtdPid->mMatchFlag;
 			trackHeap.MtdPidTraits_mMtdHitChan = mtdPid->mMtdHitChan;
+			// flip the cell for the ast 2 modules so that the phi direction is always the same
 			trackHeap.MtdPidTraits_mCell       = mtdPid->cell();
+			if ( mtdPid->module() >= 3 )
+				trackHeap.MtdPidTraits_mCell       = 12 - mtdPid->cell();
+				
 			trackHeap.MtdPidTraits_mBL         = mtdPid->backleg();
 			trackHeap.MtdPidTraits_mModule     = mtdPid->module();
 
