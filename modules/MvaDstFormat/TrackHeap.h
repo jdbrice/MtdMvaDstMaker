@@ -39,6 +39,7 @@ public:
 		MtdPidTraits_mCell       = 0;
 		MtdPidTraits_mBL         = 0;
 		MtdPidTraits_mModule     = 0;
+		MtdPidTraits_mDeltaTOF   = 0;
 	
 	}
 
@@ -66,6 +67,7 @@ public:
 		this->MtdPidTraits_mCell       = that->MtdPidTraits_mCell;
 		this->MtdPidTraits_mBL         = that->MtdPidTraits_mBL;
 		this->MtdPidTraits_mModule     = that->MtdPidTraits_mModule;
+		this->MtdPidTraits_mDeltaTOF   = that->MtdPidTraits_mDeltaTOF;
 	}
 
 	Float_t 	Tracks_mPt;				    // primary track px
@@ -92,6 +94,7 @@ public:
 	// MTD PidTratis
 	Float_t   MtdPidTraits_mDeltaY;					// DeltaY between matched track-hit pair
 	Float_t   MtdPidTraits_mDeltaZ;					// DeltaZ between matched track-hit pair
+	Float_t   MtdPidTraits_mDeltaTOF;
 	Char_t    MtdPidTraits_mMatchFlag;				// Matching flag indicating multiple matches
 	Short_t   MtdPidTraits_mMtdHitChan;				// (backleg-1) * 60 + (module-1) * 12 + cell
 	Short_t   MtdPidTraits_mCell;

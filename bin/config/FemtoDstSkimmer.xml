@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
 	<Task name="FemtoDstSkimmer" type="FemtoDstSkimmer" config="" nodePath="FDS" />
+	<mod></mod>
 	<FDS>
 		<EventLoop progress="true" />
 		<input>
-			<dst treeName="FemtoDst" url="./list.lis" splitBy="50" maxFiles="-1"/>
+			<dst treeName="FemtoDst" url="./list.lis" splitBy="500" maxFiles="-1"/>
 		</input>
 		<output>
-			<TFile url="MvaDst_{jobIndex}.root" />
+			<TFile url="MvaDst_{mod}_{jobIndex}.root" />
 		</output>
+
+		<DeltaTOF>
+			<XmlFunction name="signal" formula="gaus" p0="1" p1="-4.01567e-02" p2="1.41013e-01" min="-1" max="1" Npx="1000"/>
+			<XmlHistogram name="bg" url="config/deltaTOF_pdfs.root" />
+		</DeltaTOF>
 	</FDS>
 </config>

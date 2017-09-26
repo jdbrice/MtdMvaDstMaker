@@ -19,6 +19,9 @@
 
 #include "MvaDstFormat/TrackHeap.h"
 
+#include "XmlHistogram.h"
+#include "XmlFunction.h"
+
 #include "vendor/loguru.h"
 
 
@@ -40,6 +43,9 @@ protected:
 	TTree * wTree = nullptr;
 	
 	BranchWriter<TrackHeap> _wTrackHeap;
+
+	XmlHistogram bg_deltaTOF;
+	XmlFunction sig_deltaTOF;
 	
 
 public:
@@ -59,11 +65,27 @@ public:
 
 		book->cd();
 		wTree = new TTree( "MvaDst", "MvaDst" );
-		_wTrackHeap.createBranch( wTree, "" );
+		_wTrackHeap.createBranch( wTree, "TrackHeap" );
+
+		bg_deltaTOF.load( config, nodePath + ".DeltaTOF.XmlHistogram" );
+		sig_deltaTOF.set( config, nodePath + ".DeltaTOF.XmlFunction" );
+
+		book->cd();
+		sig_deltaTOF.getTF1()->Write();
+		bg_deltaTOF.getTH1()->Write();
 	
 	}
 
 protected:
+
+
+	bool isSignal( FemtoMcTrack * mcTrack ){
+		if ( nullptr == mcTrack )
+			return false;
+		if ( 5 == mcTrack->mGeantPID || 6 == mcTrack->mGeantPID )
+			return true;
+		return false;
+	}
 
 	virtual void analyzeEvent(){
 		_event = _rEvent.get();
@@ -120,6 +142,16 @@ protected:
 			trackHeap.MtdPidTraits_mBL         = mtdPid->backleg();
 			trackHeap.MtdPidTraits_mModule     = mtdPid->module();
 
+			double deltaTof = -999;
+			if (isSignal( mcTrack  )){
+				// LOG_F( INFO, "Signal" );
+				deltaTof = sig_deltaTOF.getTF1()->GetRandom();
+			} else {
+				// LOG_F( INFO, "Background" );
+				deltaTof = bg_deltaTOF.getTH1()->GetRandom();
+			}
+
+			trackHeap.MtdPidTraits_mDeltaTOF = deltaTof;
 
 			_wTrackHeap.set( trackHeap );
 			wTree->Fill();
