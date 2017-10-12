@@ -4,8 +4,8 @@
 	<mod></mod>
 	<FDS>
 		<EventLoop progress="true" />
-		<input>
-			<dst treeName="FemtoDst" url="./list.lis" splitBy="500" maxFiles="-1"/>
+		<input decayInsideTPC="false" decayOutsideTPC="true" >
+			<dst treeName="FemtoDst" url="./list.lis" splitBy="1" maxFiles="-1"/>
 		</input>
 		<output>
 			<TFile url="MvaDst_{mod}_{jobIndex}.root" />

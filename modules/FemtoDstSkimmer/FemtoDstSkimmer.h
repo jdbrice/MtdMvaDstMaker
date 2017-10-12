@@ -46,6 +46,9 @@ protected:
 
 	XmlHistogram bg_deltaTOF;
 	XmlFunction sig_deltaTOF;
+
+	bool decayInsideTPC = false;
+	bool decayOutsideTPC = false;
 	
 
 public:
@@ -73,18 +76,86 @@ public:
 		book->cd();
 		sig_deltaTOF.getTF1()->Write();
 		bg_deltaTOF.getTH1()->Write();
+
+		if ( nullptr != chain ){
+			LOG_F( INFO, "nTrees=%d", chain->GetNtrees() );
+		}
+
+		decayInsideTPC = config.getBool( nodePath + ".input:decayInsideTPC", false );
+		decayOutsideTPC = config.getBool( nodePath + ".input:decayOutsideTPC", false );
 	
 	}
 
 protected:
 
+	string plcName( int gid ){
+		if ( 5 == gid )
+			return "mu+";
+		if ( 6 == gid )
+			return "mu-";
+		if ( 8 == gid )
+			return "pi+";
+		if ( 9 == gid )
+			return "pi-";
+		return "";
+	}
+
+	int plcCharge( int gid ){
+		if ( 5 == gid )
+			return 1;
+		if ( 6 == gid )
+			return -1;
+		if ( 8 == gid )
+			return 1;
+		if ( 9 == gid )
+			return -1;
+		return 0;
+	}
 
 	bool isSignal( FemtoMcTrack * mcTrack ){
 		if ( nullptr == mcTrack )
 			return false;
-		if ( 5 == mcTrack->mGeantPID || 6 == mcTrack->mGeantPID )
+		if ( 5 == mcTrack->mGeantPID || 6 == mcTrack->mGeantPID ){
+			// LOG_F( INFO, "SIGNAL" );
+			// if ( mcTrack->mParentIndex >= 0 ){
+			// 	auto parent = _rMcTracks.get( mcTrack->mParentIndex );
+			// 	LOG_F( INFO, "ParentId : %d", parent->mGeantPID );
+			// }
+			
 			return true;
+		}
 		return false;
+	}
+
+	bool isDecayMuon( FemtoMcTrack * mcTrack ){
+		if (nullptr == mcTrack) 
+			return false;
+		if ( 5 == mcTrack->mGeantPID || 6 == mcTrack->mGeantPID ){
+			if ( mcTrack->mParentIndex < 0 ) // signal muon (primary)
+				return false;
+			
+			auto parent = _rMcTracks.get( mcTrack->mParentIndex );
+			if (8 == parent->mGeantPID || 9 == parent->mGeantPID || 11 == parent->mGeantPID || 12 == parent->mGeantPID )
+				return true;
+			return false;
+			LOG_F( 1, "Decay mu[%s -> %s]", plcName(parent->mGeantPID).c_str(), plcName(mcTrack->mGeantPID).c_str() );
+		}
+
+		return false;
+	}
+
+	bool isDecayMuonInsideTPC( FemtoMcTrack *mcTrack ){
+		return isDecayMuon( mcTrack );
+	}
+
+	bool isDecayMuonOutsideTPC( FemtoMtdPidTraits *mtdPid ){
+		if (nullptr == mtdPid) 
+			return false;
+		if ( mtdPid->mIdTruth < 0 )
+			return false;
+		auto mcTrack = _rMcTracks.get( mtdPid->mIdTruth );
+
+		return isDecayMuon( mcTrack );
 	}
 
 	virtual void analyzeEvent(){
@@ -108,8 +179,17 @@ protected:
 			if ( track->mMcIndex >= 0 )
 				mcTrack = _rMcTracks.get( track->mMcIndex );
 
-			if ( nullptr == mtdPid || nullptr == mcTrack || mcTrack->mParentIndex >= 0 )
+			if ( nullptr == mtdPid || nullptr == mcTrack )
 				continue;
+
+			bool inTPC = isDecayMuonInsideTPC(mcTrack);
+			bool outTPC = isDecayMuonOutsideTPC( mtdPid );
+			if ( inTPC != decayInsideTPC ){
+				continue;
+			}
+			if ( outTPC != decayOutsideTPC ){
+				continue;
+			}
 			
 			trackHeap.Tracks_mPt               = track->mPt;
 			trackHeap.Tracks_mEta              = track->mEta;
