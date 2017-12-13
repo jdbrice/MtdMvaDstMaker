@@ -148,14 +148,17 @@ protected:
 		return isDecayMuon( mcTrack );
 	}
 
-	bool isDecayMuonOutsideTPC( FemtoMtdPidTraits *mtdPid ){
+	bool isDecayMuonOutsideTPC( FemtoMtdPidTraits *mtdPid, FemtoMcTrack *mcTrack ){
 		if (nullptr == mtdPid) 
 			return false;
 		if ( mtdPid->mIdTruth < 0 )
 			return false;
-		auto mcTrack = _rMcTracks.get( mtdPid->mIdTruth );
+		auto mtdMcTrack = _rMcTracks.get( mtdPid->mIdTruth );
 
-		return isDecayMuon( mcTrack );
+		if ( mcTrack->mParentIndex >= 0 )
+			return false;
+
+		return isDecayMuon( mtdMcTrack );
 	}
 
 	virtual void analyzeEvent(){
@@ -174,6 +177,7 @@ protected:
 
 			FemtoMcTrack * mcTrack = nullptr;
 			FemtoMtdPidTraits *mtdPid = nullptr;
+
 			if ( track->mMtdPidTraitsIndex >= 0) 
 				mtdPid = _rMtdPid.get( track->mMtdPidTraitsIndex );
 			if ( track->mMcIndex >= 0 )
@@ -182,14 +186,14 @@ protected:
 			if ( nullptr == mtdPid || nullptr == mcTrack )
 				continue;
 
-			bool inTPC = isDecayMuonInsideTPC(mcTrack);
-			bool outTPC = isDecayMuonOutsideTPC( mtdPid );
-			if ( inTPC != decayInsideTPC ){
-				continue;
-			}
-			if ( outTPC != decayOutsideTPC ){
-				continue;
-			}
+			// bool inTPC = isDecayMuonInsideTPC(mcTrack);
+			// bool outTPC = isDecayMuonOutsideTPC( mtdPid, mcTrack );
+			// if ( inTPC != decayInsideTPC ){
+			// 	continue;
+			// }
+			// if ( outTPC != decayOutsideTPC ){
+			// 	continue;
+			// }
 			
 			trackHeap.Tracks_mPt               = track->mPt;
 			trackHeap.Tracks_mEta              = track->mEta;

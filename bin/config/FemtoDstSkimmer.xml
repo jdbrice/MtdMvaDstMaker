@@ -4,7 +4,7 @@
 	<mod></mod>
 	<FDS>
 		<EventLoop progress="true" />
-		<input decayInsideTPC="false" decayOutsideTPC="true" >
+		<input decayInsideTPC="true" decayOutsideTPC="true" >
 			<dst treeName="FemtoDst" url="./list.lis" splitBy="1" maxFiles="-1"/>
 		</input>
 		<output>
