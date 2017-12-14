@@ -45,8 +45,12 @@ protected:
 	BranchWriter<TrackHeap> _wTrackHeap;
 
 	XmlHistogram bg_deltaTOF;
+<<<<<<< HEAD
 	TH2 * hsigdtof;
 	XmlHistogram sig_deltaTOF;
+=======
+	XmlFunction sig_deltaTOF;
+>>>>>>> d27a9cdbf82c84013337aed2a27a93c6263a2f79
 
 	bool decayInsideTPC = false;
 	bool decayOutsideTPC = false;
@@ -71,12 +75,20 @@ public:
 		wTree = new TTree( "MvaDst", "MvaDst" );
 		_wTrackHeap.createBranch( wTree, "TrackHeap" );
 
+<<<<<<< HEAD
 		bg_deltaTOF.load( config, nodePath + ".DeltaTOF.XmlHistogram[1]" );
 		sig_deltaTOF.load( config, nodePath + ".DeltaTOF.XmlHistogram[0]" );
 
 		book->cd();
 		sig_deltaTOF.getTH1()->Write();
 		hsigdtof = ((TH2*)sig_deltaTOF.getTH1().get());
+=======
+		bg_deltaTOF.load( config, nodePath + ".DeltaTOF.XmlHistogram" );
+		sig_deltaTOF.set( config, nodePath + ".DeltaTOF.XmlFunction" );
+
+		book->cd();
+		sig_deltaTOF.getTF1()->Write();
+>>>>>>> d27a9cdbf82c84013337aed2a27a93c6263a2f79
 		bg_deltaTOF.getTH1()->Write();
 
 		if ( nullptr != chain ){
@@ -84,7 +96,11 @@ public:
 		}
 
 		decayInsideTPC = config.getBool( nodePath + ".input:decayInsideTPC", false );
+<<<<<<< HEAD
 		decayOutsideTPC = config.getBool( nodePath + ".input:decayOutsideTPC", true );
+=======
+		decayOutsideTPC = config.getBool( nodePath + ".input:decayOutsideTPC", false );
+>>>>>>> d27a9cdbf82c84013337aed2a27a93c6263a2f79
 	
 	}
 
@@ -119,12 +135,6 @@ protected:
 			return false;
 		if ( 5 == mcTrack->mGeantPID || 6 == mcTrack->mGeantPID ){
 
-
-			// LOG_F( INFO, "SIGNAL" );
-			// if ( mcTrack->mParentIndex >= 0 ){
-			// 	auto parent = _rMcTracks.get( mcTrack->mParentIndex );
-			// 	LOG_F( INFO, "ParentId : %d", parent->mGeantPID );
-			// }
 			if ( mcTrack->mParentIndex < 0 )
 				return true;
 			else 
@@ -167,9 +177,6 @@ protected:
 		return isDecayMuon( mtdMcTrack );
 	}
 
-
-
-
 	virtual void analyzeEvent(){
 		_event = _rEvent.get();
 
@@ -199,7 +206,6 @@ protected:
 			if ( inTPC != decayInsideTPC ){
 				continue;
 			}
-			
 			
 			trackHeap.Tracks_mPt               = track->mPt;
 			trackHeap.Tracks_mEta              = track->mEta;
