@@ -19,6 +19,9 @@
 
 #include "MvaDstFormat/TrackHeap.h"
 
+#include "XmlHistogram.h"
+#include "XmlFunction.h"
+
 #include "vendor/loguru.h"
 
 
@@ -40,6 +43,13 @@ protected:
 	TTree * wTree = nullptr;
 	
 	BranchWriter<TrackHeap> _wTrackHeap;
+
+	XmlHistogram bg_deltaTOF;
+	TH2 * hsigdtof;
+	XmlHistogram sig_deltaTOF;
+
+	bool decayInsideTPC = false;
+	bool decayOutsideTPC = false;
 	
 
 public:
@@ -59,11 +69,106 @@ public:
 
 		book->cd();
 		wTree = new TTree( "MvaDst", "MvaDst" );
-		_wTrackHeap.createBranch( wTree, "" );
+		_wTrackHeap.createBranch( wTree, "TrackHeap" );
+
+		bg_deltaTOF.load( config, nodePath + ".DeltaTOF.XmlHistogram[1]" );
+		sig_deltaTOF.load( config, nodePath + ".DeltaTOF.XmlHistogram[0]" );
+
+		book->cd();
+		sig_deltaTOF.getTH1()->Write();
+		hsigdtof = ((TH2*)sig_deltaTOF.getTH1().get());
+		bg_deltaTOF.getTH1()->Write();
+
+		if ( nullptr != chain ){
+			LOG_F( INFO, "nTrees=%d", chain->GetNtrees() );
+		}
+
+		decayInsideTPC = config.getBool( nodePath + ".input:decayInsideTPC", false );
+		decayOutsideTPC = config.getBool( nodePath + ".input:decayOutsideTPC", true );
 	
 	}
 
 protected:
+
+	string plcName( int gid ){
+		if ( 5 == gid )
+			return "mu+";
+		if ( 6 == gid )
+			return "mu-";
+		if ( 8 == gid )
+			return "pi+";
+		if ( 9 == gid )
+			return "pi-";
+		return "";
+	}
+
+	int plcCharge( int gid ){
+		if ( 5 == gid )
+			return 1;
+		if ( 6 == gid )
+			return -1;
+		if ( 8 == gid )
+			return 1;
+		if ( 9 == gid )
+			return -1;
+		return 0;
+	}
+
+	bool isSignal( FemtoMcTrack * mcTrack ){
+		if ( nullptr == mcTrack )
+			return false;
+		if ( 5 == mcTrack->mGeantPID || 6 == mcTrack->mGeantPID ){
+
+
+			// LOG_F( INFO, "SIGNAL" );
+			// if ( mcTrack->mParentIndex >= 0 ){
+			// 	auto parent = _rMcTracks.get( mcTrack->mParentIndex );
+			// 	LOG_F( INFO, "ParentId : %d", parent->mGeantPID );
+			// }
+			if ( mcTrack->mParentIndex < 0 )
+				return true;
+			else 
+				return false;
+		}
+		return false;
+	}
+
+	bool isDecayMuon( FemtoMcTrack * mcTrack ){
+		if (nullptr == mcTrack) 
+			return false;
+		if ( 5 == mcTrack->mGeantPID || 6 == mcTrack->mGeantPID ){
+			if ( mcTrack->mParentIndex < 0 ) // signal muon (primary)
+				return false;
+			
+			auto parent = _rMcTracks.get( mcTrack->mParentIndex );
+			if (8 == parent->mGeantPID || 9 == parent->mGeantPID || 11 == parent->mGeantPID || 12 == parent->mGeantPID )
+				return true;
+			return false;
+			LOG_F( 1, "Decay mu[%s -> %s]", plcName(parent->mGeantPID).c_str(), plcName(mcTrack->mGeantPID).c_str() );
+		}
+
+		return false;
+	}
+
+	bool isDecayMuonInsideTPC( FemtoMcTrack *mcTrack ){
+		return isDecayMuon( mcTrack );
+	}
+
+	bool isDecayMuonOutsideTPC( FemtoMtdPidTraits *mtdPid, FemtoMcTrack *mcTrack ){
+		if (nullptr == mtdPid) 
+			return false;
+		if ( mtdPid->mIdTruth < 0 )
+			return false;
+		auto mtdMcTrack = _rMcTracks.get( mtdPid->mIdTruth );
+
+		if ( mcTrack->mParentIndex >= 0 )
+			return false;
+
+		return isDecayMuon( mtdMcTrack );
+	}
+
+
+
 
 	virtual void analyzeEvent(){
 		_event = _rEvent.get();
@@ -81,13 +186,20 @@ protected:
 
 			FemtoMcTrack * mcTrack = nullptr;
 			FemtoMtdPidTraits *mtdPid = nullptr;
+
 			if ( track->mMtdPidTraitsIndex >= 0) 
 				mtdPid = _rMtdPid.get( track->mMtdPidTraitsIndex );
 			if ( track->mMcIndex >= 0 )
 				mcTrack = _rMcTracks.get( track->mMcIndex );
 
-			if ( nullptr == mtdPid || nullptr == mcTrack || mcTrack->mParentIndex >= 0 )
+			if ( nullptr == mtdPid || nullptr == mcTrack )
 				continue;
+
+			bool inTPC = isDecayMuonInsideTPC(mcTrack);
+			if ( inTPC != decayInsideTPC ){
+				continue;
+			}
+			
 			
 			trackHeap.Tracks_mPt               = track->mPt;
 			trackHeap.Tracks_mEta              = track->mEta;
@@ -112,14 +224,32 @@ protected:
 			trackHeap.MtdPidTraits_mDeltaZ     = mtdPid->mDeltaZ;
 			trackHeap.MtdPidTraits_mMatchFlag  = mtdPid->mMatchFlag;
 			trackHeap.MtdPidTraits_mMtdHitChan = mtdPid->mMtdHitChan;
-			// flip the cell for the last 2 modules so that the phi direction is always the same
+			
 			trackHeap.MtdPidTraits_mCell       = mtdPid->cell();
-			if ( mtdPid->module() >= 3 )
-				trackHeap.MtdPidTraits_mCell       = 11 - mtdPid->cell();
+			
+			// flip the cell for the last 2 modules so that the phi direction is always the same
+			// if ( mtdPid->module() >= 3 )
+				// trackHeap.MtdPidTraits_mCell       = 11 - mtdPid->cell();
 				
 			trackHeap.MtdPidTraits_mBL         = mtdPid->backleg();
 			trackHeap.MtdPidTraits_mModule     = mtdPid->module();
 
+			double deltaTof = -999;
+			if (isSignal( mcTrack  )){
+				// LOG_F( INFO, "Signal" );
+				float pt = track->mPt;
+				if ( pt > 14 ) pt = 14;
+				int ptbin = hsigdtof->GetXaxis()->FindBin( pt );
+				TH1 * hptslice = hsigdtof->ProjectionY( "tmp", ptbin, ptbin );
+				// cout << "track pT = " << track->mPt << endl;
+				deltaTof = hptslice->GetRandom();
+				delete hptslice;
+			} else {
+				// LOG_F( INFO, "Background" );
+				deltaTof = bg_deltaTOF.getTH1()->GetRandom();
+			}
+
+			trackHeap.MtdPidTraits_mDeltaTOF = deltaTof;
 
 			_wTrackHeap.set( trackHeap );
 			wTree->Fill();
