@@ -45,12 +45,9 @@ protected:
 	BranchWriter<TrackHeap> _wTrackHeap;
 
 	XmlHistogram bg_deltaTOF;
-<<<<<<< HEAD
 	TH2 * hsigdtof;
 	XmlHistogram sig_deltaTOF;
-=======
-	XmlFunction sig_deltaTOF;
->>>>>>> d27a9cdbf82c84013337aed2a27a93c6263a2f79
+
 
 	bool decayInsideTPC = false;
 	bool decayOutsideTPC = false;
@@ -75,20 +72,12 @@ public:
 		wTree = new TTree( "MvaDst", "MvaDst" );
 		_wTrackHeap.createBranch( wTree, "TrackHeap" );
 
-<<<<<<< HEAD
 		bg_deltaTOF.load( config, nodePath + ".DeltaTOF.XmlHistogram[1]" );
 		sig_deltaTOF.load( config, nodePath + ".DeltaTOF.XmlHistogram[0]" );
 
 		book->cd();
 		sig_deltaTOF.getTH1()->Write();
 		hsigdtof = ((TH2*)sig_deltaTOF.getTH1().get());
-=======
-		bg_deltaTOF.load( config, nodePath + ".DeltaTOF.XmlHistogram" );
-		sig_deltaTOF.set( config, nodePath + ".DeltaTOF.XmlFunction" );
-
-		book->cd();
-		sig_deltaTOF.getTF1()->Write();
->>>>>>> d27a9cdbf82c84013337aed2a27a93c6263a2f79
 		bg_deltaTOF.getTH1()->Write();
 
 		if ( nullptr != chain ){
@@ -96,11 +85,8 @@ public:
 		}
 
 		decayInsideTPC = config.getBool( nodePath + ".input:decayInsideTPC", false );
-<<<<<<< HEAD
 		decayOutsideTPC = config.getBool( nodePath + ".input:decayOutsideTPC", true );
-=======
-		decayOutsideTPC = config.getBool( nodePath + ".input:decayOutsideTPC", false );
->>>>>>> d27a9cdbf82c84013337aed2a27a93c6263a2f79
+
 	
 	}
 
@@ -177,6 +163,21 @@ protected:
 		return isDecayMuon( mtdMcTrack );
 	}
 
+	double nSigmaDeltaY( float pt, float dy ){
+		double sigy = -17.6867 + 18.4528*exp(0.637142/pt);
+		return dy / sigy;
+	}
+
+	double nSigmaDeltaZ( float pt, float dz ){
+		double sigz = -32.6793 + 32.6034 * exp( 0.444217 / pt );
+		return dz / sigz;
+	}
+
+	double nSigmaDeltaTOF( float pt, float dtof ){
+		double sigdtof = 0.100915 + 0.00911555 * exp( 3.47368 / pt );
+		return dtof / sigdtof;
+	}
+
 	virtual void analyzeEvent(){
 		_event = _rEvent.get();
 
@@ -227,35 +228,34 @@ protected:
 			trackHeap.McTracks_mNHits          = mcTrack->mNHits;
 
 			trackHeap.MtdPidTraits_mDeltaY     = mtdPid->mDeltaY;
+			trackHeap.MtdPidTraits_mNSigDeltaY = nSigmaDeltaY( track->mPt, mtdPid->mDeltaY );
 			trackHeap.MtdPidTraits_mDeltaZ     = mtdPid->mDeltaZ;
+			trackHeap.MtdPidTraits_mNSigDeltaZ = nSigmaDeltaZ( track->mPt, mtdPid->mDeltaZ );
 			trackHeap.MtdPidTraits_mMatchFlag  = mtdPid->mMatchFlag;
 			trackHeap.MtdPidTraits_mMtdHitChan = mtdPid->mMtdHitChan;
 			
 			trackHeap.MtdPidTraits_mCell       = mtdPid->cell();
-			
-			// flip the cell for the last 2 modules so that the phi direction is always the same
-			// if ( mtdPid->module() >= 3 )
-				// trackHeap.MtdPidTraits_mCell       = 11 - mtdPid->cell();
-				
 			trackHeap.MtdPidTraits_mBL         = mtdPid->backleg();
 			trackHeap.MtdPidTraits_mModule     = mtdPid->module();
 
 			double deltaTof = -999;
 			if (isSignal( mcTrack  )){
-				// LOG_F( INFO, "Signal" );
+				
 				float pt = track->mPt;
 				if ( pt > 14 ) pt = 14;
 				int ptbin = hsigdtof->GetXaxis()->FindBin( pt );
 				TH1 * hptslice = hsigdtof->ProjectionY( "tmp", ptbin, ptbin );
-				// cout << "track pT = " << track->mPt << endl;
+				
+				// sample the dtof distribution
 				deltaTof = hptslice->GetRandom();
 				delete hptslice;
+
 			} else {
-				// LOG_F( INFO, "Background" );
 				deltaTof = bg_deltaTOF.getTH1()->GetRandom();
 			}
 
-			trackHeap.MtdPidTraits_mDeltaTOF = deltaTof;
+			trackHeap.MtdPidTraits_mDeltaTOF     = deltaTof;
+			trackHeap.MtdPidTraits_mNSigDeltaTOF = nSigmaDeltaTOF( track->mPt, deltaTof );
 
 			_wTrackHeap.set( trackHeap );
 			wTree->Fill();

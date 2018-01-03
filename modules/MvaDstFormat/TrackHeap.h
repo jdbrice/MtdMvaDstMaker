@@ -14,60 +14,66 @@ public:
 	}
 
 	void reset(){
-		Tracks_mPt               = 0;
-		Tracks_mEta              = 0;
-		Tracks_mPhi              = 0;
-		Tracks_mDedx             = 0;
-		Tracks_mCharge           = 0;
-		Tracks_mNHitsFit         = 0;
-		Tracks_mNHitsMax         = 0;
-		Tracks_mNHitsDedx        = 0;
-		Tracks_mNSigmaPion       = -99;
-		Tracks_mDCA              = 99;
+		Tracks_mPt                 = 0;
+		Tracks_mEta                = 0;
+		Tracks_mPhi                = 0;
+		Tracks_mDedx               = 0;
+		Tracks_mCharge             = 0;
+		Tracks_mNHitsFit           = 0;
+		Tracks_mNHitsMax           = 0;
+		Tracks_mNHitsDedx          = 0;
+		Tracks_mNSigmaPion         = -99;
+		Tracks_mDCA                = 99;
 		
-		McTracks_mPt             = 0;
-		McTracks_mEta            = 0;
-		McTracks_mPhi            = 0;
-		McTracks_mGeantPID       = 0;
-		McTracks_mCharge         = 0;
-		McTracks_mNHits          = 0;
+		McTracks_mPt               = 0;
+		McTracks_mEta              = 0;
+		McTracks_mPhi              = 0;
+		McTracks_mGeantPID         = 0;
+		McTracks_mCharge           = 0;
+		McTracks_mNHits            = 0;
 
-		MtdPidTraits_mDeltaY     = 999;
-		MtdPidTraits_mDeltaZ     = 999;
-		MtdPidTraits_mMatchFlag  = 0;
-		MtdPidTraits_mMtdHitChan = 0;
-		MtdPidTraits_mCell       = 0;
-		MtdPidTraits_mBL         = 0;
-		MtdPidTraits_mModule     = 0;
-		MtdPidTraits_mDeltaTOF   = 0;
+		MtdPidTraits_mDeltaY       = 999;
+		MtdPidTraits_mNSigDeltaY   = 999;
+		MtdPidTraits_mDeltaZ       = 999;
+		MtdPidTraits_mNSigDeltaZ   = 999;
+		MtdPidTraits_mMatchFlag    = 0;
+		MtdPidTraits_mMtdHitChan   = -1;
+		MtdPidTraits_mCell         = -1;
+		MtdPidTraits_mBL           = -1;
+		MtdPidTraits_mModule       = -1;
+		MtdPidTraits_mDeltaTOF     = 999;
+		MtdPidTraits_mNSigDeltaTOF = 999;
 	
 	}
 
 	void copy( TrackHeap * that ) {
-		this->Tracks_mPt               = that->Tracks_mPt;
-		this->Tracks_mEta              = that->Tracks_mEta;
-		this->Tracks_mPhi              = that->Tracks_mPhi;
-		this->Tracks_mDedx             = that->Tracks_mDedx;
-		this->Tracks_mCharge           = that->Tracks_mCharge;
-		this->Tracks_mNHitsFit         = that->Tracks_mNHitsFit;
-		this->Tracks_mNHitsMax         = that->Tracks_mNHitsMax;
-		this->Tracks_mNHitsDedx        = that->Tracks_mNHitsDedx;
-		this->Tracks_mNSigmaPion       = that->Tracks_mNSigmaPion;
-		this->Tracks_mDCA              = that->Tracks_mDCA;
-		this->McTracks_mPt             = that->McTracks_mPt;
-		this->McTracks_mEta            = that->McTracks_mEta;
-		this->McTracks_mPhi            = that->McTracks_mPhi;
-		this->McTracks_mGeantPID       = that->McTracks_mGeantPID;
-		this->McTracks_mCharge         = that->McTracks_mCharge;
-		this->McTracks_mNHits          = that->McTracks_mNHits;
-		this->MtdPidTraits_mDeltaY     = that->MtdPidTraits_mDeltaY;
-		this->MtdPidTraits_mDeltaZ     = that->MtdPidTraits_mDeltaZ;
-		this->MtdPidTraits_mMatchFlag  = that->MtdPidTraits_mMatchFlag;
-		this->MtdPidTraits_mMtdHitChan = that->MtdPidTraits_mMtdHitChan;
-		this->MtdPidTraits_mCell       = that->MtdPidTraits_mCell;
-		this->MtdPidTraits_mBL         = that->MtdPidTraits_mBL;
-		this->MtdPidTraits_mModule     = that->MtdPidTraits_mModule;
-		this->MtdPidTraits_mDeltaTOF   = that->MtdPidTraits_mDeltaTOF;
+		this->Tracks_mPt                   = that->Tracks_mPt;
+		this->Tracks_mEta                  = that->Tracks_mEta;
+		this->Tracks_mPhi                  = that->Tracks_mPhi;
+		this->Tracks_mDedx                 = that->Tracks_mDedx;
+		this->Tracks_mCharge               = that->Tracks_mCharge;
+		this->Tracks_mNHitsFit             = that->Tracks_mNHitsFit;
+		this->Tracks_mNHitsMax             = that->Tracks_mNHitsMax;
+		this->Tracks_mNHitsDedx            = that->Tracks_mNHitsDedx;
+		this->Tracks_mNSigmaPion           = that->Tracks_mNSigmaPion;
+		this->Tracks_mDCA                  = that->Tracks_mDCA;
+		this->McTracks_mPt                 = that->McTracks_mPt;
+		this->McTracks_mEta                = that->McTracks_mEta;
+		this->McTracks_mPhi                = that->McTracks_mPhi;
+		this->McTracks_mGeantPID           = that->McTracks_mGeantPID;
+		this->McTracks_mCharge             = that->McTracks_mCharge;
+		this->McTracks_mNHits              = that->McTracks_mNHits;
+		this->MtdPidTraits_mDeltaY         = that->MtdPidTraits_mDeltaY;
+		this->MtdPidTraits_mNSigDeltaY     = that->MtdPidTraits_mNSigDeltaY;
+		this->MtdPidTraits_mDeltaZ         = that->MtdPidTraits_mDeltaZ;
+		this->MtdPidTraits_mNSigDeltaZ     = that->MtdPidTraits_mNSigDeltaZ;
+		this->MtdPidTraits_mMatchFlag      = that->MtdPidTraits_mMatchFlag;
+		this->MtdPidTraits_mMtdHitChan     = that->MtdPidTraits_mMtdHitChan;
+		this->MtdPidTraits_mCell           = that->MtdPidTraits_mCell;
+		this->MtdPidTraits_mBL             = that->MtdPidTraits_mBL;
+		this->MtdPidTraits_mModule         = that->MtdPidTraits_mModule;
+		this->MtdPidTraits_mDeltaTOF       = that->MtdPidTraits_mDeltaTOF;
+		this->MtdPidTraits_mNSigDeltaTOF   = that->MtdPidTraits_mNSigDeltaTOF;
 	}
 
 	Float_t 	Tracks_mPt;				    // primary track px
@@ -94,13 +100,16 @@ public:
 	// MTD PidTratis
 	Float_t   MtdPidTraits_mDeltaY;					// DeltaY between matched track-hit pair
 	Float_t   MtdPidTraits_mDeltaZ;					// DeltaZ between matched track-hit pair
-	Float_t   MtdPidTraits_mDeltaTOF;
+	Float_t   MtdPidTraits_mNSigDeltaY;				// n sigma DeltaY between matched track-hit pair
+	Float_t   MtdPidTraits_mNSigDeltaZ;				// n sigma DeltaZ between matched track-hit pair
+	Float_t   MtdPidTraits_mDeltaTOF;				// DeltaTOF
+	Float_t   MtdPidTraits_mNSigDeltaTOF;			// n sigma DeltaTOF 
 	Char_t    MtdPidTraits_mMatchFlag;				// Matching flag indicating multiple matches
 	Short_t   MtdPidTraits_mMtdHitChan;				// (backleg-1) * 60 + (module-1) * 12 + cell
 	Short_t   MtdPidTraits_mCell;
 	Short_t   MtdPidTraits_mBL;
 	Short_t   MtdPidTraits_mModule;
-	ClassDef( TrackHeap, 1 )
+	ClassDef( TrackHeap, 2 )
 };
 
 #endif
